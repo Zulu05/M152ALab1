@@ -19,6 +19,8 @@ module tb;
    integer count;
    reg [7:0] instructions[1023:0];
    reg curr[7:0];
+   integer file;
+   integer exitCode;
    
    initial
      begin
@@ -47,10 +49,17 @@ module tb;
         btnS = 0;
         #1000 btnR = 0;
         #1500000;
-        $readmemb("seq.code", instructions);
-        count = instructions[0];
-        for (i=1; i < count; i = i+1) begin
-            curr = instructions[i];
+//        $readmemb("seq.code", instructions);
+        file = $fopen("seq.code", "r");
+        exitCode = $fscanf(file, "%b\n", count);
+//        $display(count);
+        for (i=1; i <= count; i = i+1) begin
+            exitCode = $fscanf(file, "%b\n", instructions[i]);
+        end
+        $fclose(file); 
+        for (i = 1; i <= count; i = i + 1) begin
+            tskRunInst(instructions[i]);
+//            $display(i);
         end
         
         $finish;
